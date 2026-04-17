@@ -1,25 +1,30 @@
 import './global.css'
 import type { Metadata } from 'next'
-import { GeistSans } from 'geist/font/sans'
-import { GeistMono } from 'geist/font/mono'
+import { Work_Sans } from 'next/font/google'
+import { LanguageProvider } from './components/language-provider'
 import { Navbar } from './components/nav'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import Footer from './components/footer'
 import { baseUrl } from './sitemap'
 
+const workSans = Work_Sans({
+  subsets: ['latin'],
+  weight: '400',
+})
+
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
-    default: 'Next.js Portfolio Starter',
-    template: '%s | Next.js Portfolio Starter',
+    default: 'Dorian Michael',
+    template: '%s | Dorian Michael',
   },
-  description: 'This is my portfolio.',
+  description: 'Personal blog about software, interfaces, tools, and product thinking.',
   openGraph: {
-    title: 'My Portfolio',
-    description: 'This is my portfolio.',
+    title: 'Dorian Michael',
+    description: 'Personal blog about software, interfaces, tools, and product thinking.',
     url: baseUrl,
-    siteName: 'My Portfolio',
+    siteName: 'Dorian Michael',
     locale: 'en_US',
     type: 'website',
   },
@@ -44,22 +49,38 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html
-      lang="en"
-      className={cx(
-        'text-black bg-white dark:text-white dark:bg-black',
-        GeistSans.variable,
-        GeistMono.variable
-      )}
-    >
-      <body className="antialiased max-w-xl mx-4 mt-8 lg:mx-auto">
-        <main className="flex-auto min-w-0 mt-6 flex flex-col px-2 md:px-0">
-          <Navbar />
-          {children}
-          <Footer />
-          <Analytics />
-          <SpeedInsights />
-        </main>
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className={cx(
+          workSans.className,
+          'text-[14px] leading-7 antialiased transition-colors'
+        )}
+      >
+        <LanguageProvider>
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                (() => {
+                  const storedTheme = localStorage.getItem('theme')
+                  const theme = storedTheme === 'light' || storedTheme === 'dark'
+                    ? storedTheme
+                    : window.matchMedia('(prefers-color-scheme: dark)').matches
+                      ? 'dark'
+                      : 'light'
+                  document.documentElement.classList.remove('light', 'dark')
+                  document.documentElement.classList.add(theme)
+                })()
+              `,
+            }}
+          />
+          <main className="mx-4 mt-8 flex min-w-0 max-w-3xl flex-auto flex-col px-2 md:mx-auto md:px-0">
+            <Navbar />
+            {children}
+            <Footer />
+            <Analytics />
+            <SpeedInsights />
+          </main>
+        </LanguageProvider>
       </body>
     </html>
   )

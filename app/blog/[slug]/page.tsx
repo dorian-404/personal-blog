@@ -1,7 +1,11 @@
 import { notFound } from 'next/navigation'
+import { ArticleMeta, ArticleSidebar } from 'app/components/article-ui'
 import { CustomMDX } from 'app/components/mdx'
 import { formatDate, getBlogPosts } from 'app/blog/utils'
 import { baseUrl } from 'app/sitemap'
+
+
+// 
 
 export async function generateStaticParams() {
   let posts = getBlogPosts()
@@ -11,8 +15,13 @@ export async function generateStaticParams() {
   }))
 }
 
-export function generateMetadata({ params }) {
-  let post = getBlogPosts().find((post) => post.slug === params.slug)
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}) {
+  let { slug } = await params
+  let post = getBlogPosts().find((post) => post.slug === slug)
   if (!post) {
     return
   }
@@ -51,15 +60,20 @@ export function generateMetadata({ params }) {
   }
 }
 
-export default function Blog({ params }) {
-  let post = getBlogPosts().find((post) => post.slug === params.slug)
+export default async function Blog({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}) {
+  let { slug } = await params
+  let post = getBlogPosts().find((post) => post.slug === slug)
 
   if (!post) {
     notFound()
   }
 
   return (
-    <section>
+    <section className="relative mx-auto w-full max-w-6xl">
       <script
         type="application/ld+json"
         suppressHydrationWarning
@@ -77,22 +91,25 @@ export default function Blog({ params }) {
             url: `${baseUrl}/blog/${post.slug}`,
             author: {
               '@type': 'Person',
-              name: 'My Portfolio',
+              name: 'Dorian Michaël',
             },
           }),
         }}
       />
-      <h1 className="title font-semibold text-2xl tracking-tighter">
-        {post.metadata.title}
-      </h1>
-      <div className="flex justify-between items-center mt-2 mb-8 text-sm">
-        <p className="text-sm text-neutral-600 dark:text-neutral-400">
-          {formatDate(post.metadata.publishedAt)}
-        </p>
+      <ArticleSidebar headings={post.headings} />
+      <div className="w-full max-w-[720px] lg:pt-1">
+        <h1 className="title text-[2rem] font-medium tracking-[-0.07em] leading-[1.2] text-[var(--foreground)]">
+          {post.metadata.title}
+        </h1>
+        <ArticleMeta
+          date={formatDate(post.metadata.publishedAt)}
+          readingTime={post.readingTime}
+          tags={post.tags}
+        />
+        <article className="prose max-w-none">
+          <CustomMDX source={post.content} />
+        </article>
       </div>
-      <article className="prose">
-        <CustomMDX source={post.content} />
-      </article>
     </section>
   )
 }

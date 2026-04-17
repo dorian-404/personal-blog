@@ -6,6 +6,43 @@ type Metadata = {
   publishedAt: string
   summary: string
   image?: string
+  tags?: string
+}
+
+type Heading = {
+  level: number
+  title: string
+  slug: string
+}
+
+function slugify(str: string) {
+  return str
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/&/g, '-and-')
+    .replace(/[^\w\-]+/g, '')
+    .replace(/\-\-+/g, '-')
+}
+
+function extractHeadings(content: string) {
+  let headingRegex = /^(##|###)\s+(.*)$/gm
+  let match
+  let headings: Heading[] = []
+
+  while ((match = headingRegex.exec(content)) !== null) {
+    let level = match[1].length
+    let title = match[2].trim()
+
+    headings.push({
+      level,
+      title,
+      slug: slugify(title),
+    })
+  }
+
+  return headings
 }
 
 function parseFrontmatter(fileContent: string) {
@@ -24,6 +61,29 @@ function parseFrontmatter(fileContent: string) {
   })
 
   return { metadata: metadata as Metadata, content }
+}
+
+function getReadingTime(content: string) {
+  let words = content
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/`.*?`/g, ' ')
+    .replace(/[#>*_\-\[\]\(\)]/g, ' ')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean).length
+
+  return Math.max(1, Math.ceil(words / 200))
+}
+
+function getTags(metadata: Metadata) {
+  if (!metadata.tags) {
+    return []
+  }
+
+  return metadata.tags
+    .split(',')
+    .map((tag) => tag.trim())
+    .filter(Boolean)
 }
 
 function getMDXFiles(dir) {
@@ -45,6 +105,9 @@ function getMDXData(dir) {
       metadata,
       slug,
       content,
+      headings: extractHeadings(content),
+      readingTime: getReadingTime(content),
+      tags: getTags(metadata),
     }
   })
 }

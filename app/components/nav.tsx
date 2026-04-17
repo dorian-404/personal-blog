@@ -1,23 +1,30 @@
-import Link from 'next/link'
+'use client'
 
-const navItems = {
-  '/': {
-    name: 'home',
-  },
-  '/blog': {
-    name: 'blog',
-  },
-  'https://vercel.com/templates/next.js/portfolio-starter-kit': {
-    name: 'deploy',
-  },
-}
+import Link from 'next/link'
+import { LanguageToggle } from './language-toggle'
+import { useLanguage } from './language-provider'
+import { ThemeToggle } from './theme-toggle'
 
 export function Navbar() {
+  const { dictionary } = useLanguage()
+
+  const navItems = {
+    '/': {
+      name: dictionary.nav.home,
+    },
+    '/blog': {
+      name: dictionary.nav.blog,
+    },
+    '/projects': {
+      name: dictionary.nav.projects,
+    },
+  }
+
   return (
     <aside className="-ml-[8px] mb-16 tracking-tight">
-      <div className="lg:sticky lg:top-20">
+      <div className="mx-auto w-full max-w-3xl lg:sticky lg:top-20">
         <nav
-          className="flex flex-row items-start relative px-0 pb-0 fade md:overflow-auto scroll-pr-6 md:relative"
+          className="fade relative flex flex-row items-center justify-between overflow-visible px-0 pb-0 md:relative scroll-pr-6"
           id="nav"
         >
           <div className="flex flex-row space-x-0 pr-10">
@@ -26,12 +33,16 @@ export function Navbar() {
                 <Link
                   key={path}
                   href={path}
-                  className="transition-all hover:text-neutral-800 dark:hover:text-neutral-200 flex align-middle relative py-1 px-2 m-1"
+                  className="m-1 flex align-middle relative py-1 px-2 transition-all text-[var(--muted)] hover:text-[var(--foreground)]"
                 >
                   {name}
                 </Link>
               )
             })}
+          </div>
+          <div className="flex items-center gap-2">
+            <LanguageToggle />
+            <ThemeToggle />
           </div>
         </nav>
       </div>

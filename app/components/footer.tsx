@@ -1,3 +1,7 @@
+'use client'
+
+import { useLanguage } from './language-provider'
+
 function ArrowIcon() {
   return (
     <svg
@@ -16,45 +20,47 @@ function ArrowIcon() {
 }
 
 export default function Footer() {
+  const { dictionary } = useLanguage()
+
   return (
-    <footer className="mb-16">
-      <ul className="font-sm mt-8 flex flex-col space-x-0 space-y-2 text-neutral-600 md:flex-row md:space-x-4 md:space-y-0 dark:text-neutral-300">
+    <footer className="mb-8">
+      <ul className="font-sm mt-8 flex flex-col space-x-0 space-y-2 text-[var(--muted)] md:flex-row md:space-x-4 md:space-y-0">
         <li>
           <a
-            className="flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100"
+            className="flex items-center transition-all hover:text-[var(--foreground)]"
             rel="noopener noreferrer"
             target="_blank"
             href="/rss"
           >
             <ArrowIcon />
-            <p className="ml-2 h-7">rss</p>
+            <p className="ml-2 h-7">{dictionary.footer.rss}</p>
           </a>
         </li>
         <li>
           <a
-            className="flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100"
+            className="flex items-center transition-all hover:text-[var(--foreground)]"
             rel="noopener noreferrer"
             target="_blank"
-            href="https://github.com/vercel/next.js"
+            href="https://github.com/dorian-404"
           >
             <ArrowIcon />
-            <p className="ml-2 h-7">github</p>
+            <p className="ml-2 h-7">{dictionary.footer.github}</p>
           </a>
         </li>
         <li>
           <a
-            className="flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100"
+            className="flex items-center transition-all hover:text-[var(--foreground)]"
             rel="noopener noreferrer"
             target="_blank"
-            href="https://vercel.com/templates/next.js/portfolio-starter-kit"
+            href="https://github.com/dorian-404"
           >
             <ArrowIcon />
-            <p className="ml-2 h-7">view source</p>
+            <p className="ml-2 h-7">{dictionary.footer.source}</p>
           </a>
         </li>
       </ul>
-      <p className="mt-8 text-neutral-600 dark:text-neutral-300">
-        © {new Date().getFullYear()} MIT Licensed
+      <p className="mt-8 text-[var(--muted)]">
+        © {new Date().getFullYear()} Dorian. {dictionary.footer.rights}
       </p>
     </footer>
   )
