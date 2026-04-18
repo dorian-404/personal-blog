@@ -1,6 +1,4 @@
-'use client'
-
-import { useLanguage } from './language-provider'
+import { getDictionary, Locale } from 'app/i18n'
 
 type Heading = {
   level: number
@@ -8,8 +6,14 @@ type Heading = {
   slug: string
 }
 
-export function ArticleSidebar({ headings }: { headings: Heading[] }) {
-  const { dictionary } = useLanguage()
+export function ArticleSidebar({
+  headings,
+  locale,
+}: {
+  headings: Heading[]
+  locale: Locale
+}) {
+  const dictionary = getDictionary(locale)
 
   if (headings.length === 0) {
     return null
@@ -17,7 +21,7 @@ export function ArticleSidebar({ headings }: { headings: Heading[] }) {
 
   return (
     <aside className="pointer-events-none absolute left-0 top-1 hidden xl:block">
-      <div className="pointer-events-auto sticky top-24 w-[150px] -translate-x-[20rem] space-y-5">
+      <div className="pointer-events-auto sticky top-24 w-[150px] -translate-x-[18.5rem] space-y-5">
         <p className="text-[0.78rem] uppercase tracking-[0.18em] text-[var(--muted-soft)]">
           {dictionary.article.onThisPage}
         </p>
@@ -30,7 +34,7 @@ export function ArticleSidebar({ headings }: { headings: Heading[] }) {
               >
                 <a
                   href={`#${heading.slug}`}
-                  className="block max-w-[150px] whitespace-normal break-words text-balance hover:text-[var(--foreground)]"
+                  className="block max-w-[145px] whitespace-normal break-words text-balance hover:text-[var(--foreground)]"
                 >
                   {heading.title}
                 </a>
@@ -47,15 +51,17 @@ export function ArticleMeta({
   date,
   readingTime,
   tags,
+  locale,
 }: {
   date: string
   readingTime: number
   tags: string[]
+  locale: Locale
 }) {
-  const { dictionary } = useLanguage()
+  const dictionary = getDictionary(locale)
 
   return (
-    <div className="mt-3 mb-10 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-[var(--muted-soft)]">
+    <div className="mb-10 mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-[var(--muted-soft)]">
       <p className="text-sm">{date}</p>
       <span aria-hidden="true">·</span>
       <p className="text-sm">
@@ -70,7 +76,7 @@ export function ArticleMeta({
                 key={tag}
                 className="text-[0.78rem] lowercase tracking-[0.12em] text-[var(--muted)]"
               >
-                #{tag}
+                #{tag.toLowerCase()}
               </span>
             ))}
           </div>

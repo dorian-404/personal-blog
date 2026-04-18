@@ -1,21 +1,20 @@
-'use client'
-
 import Link from 'next/link'
+import { getDictionary, Locale } from 'app/i18n'
 import { LanguageToggle } from './language-toggle'
-import { useLanguage } from './language-provider'
 import { ThemeToggle } from './theme-toggle'
 
-export function Navbar() {
-  const { dictionary } = useLanguage()
+export function Navbar({ locale }: { locale: Locale }) {
+  const dictionary = getDictionary(locale)
+  const prefix = locale === 'fr' ? '' : '/en'
 
   const navItems = {
-    '/': {
+    [`${prefix || '/'}`]: {
       name: dictionary.nav.home,
     },
-    '/blog': {
+    [`${prefix}/blog`]: {
       name: dictionary.nav.blog,
     },
-    '/projects': {
+    [`${prefix}/projects`]: {
       name: dictionary.nav.projects,
     },
   }
@@ -28,20 +27,18 @@ export function Navbar() {
           id="nav"
         >
           <div className="flex flex-row space-x-0 pr-10">
-            {Object.entries(navItems).map(([path, { name }]) => {
-              return (
-                <Link
-                  key={path}
-                  href={path}
-                  className="m-1 flex align-middle relative py-1 px-2 transition-all text-[var(--muted)] hover:text-[var(--foreground)]"
-                >
-                  {name}
-                </Link>
-              )
-            })}
+            {Object.entries(navItems).map(([path, { name }]) => (
+              <Link
+                key={path}
+                href={path}
+                className="m-1 flex relative align-middle px-2 py-1 text-[var(--muted)] transition-all hover:text-[var(--foreground)]"
+              >
+                {name}
+              </Link>
+            ))}
           </div>
           <div className="flex items-center gap-2">
-            <LanguageToggle />
+            <LanguageToggle locale={locale} />
             <ThemeToggle />
           </div>
         </nav>

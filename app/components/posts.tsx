@@ -1,8 +1,10 @@
 import Link from 'next/link'
 import { getBlogPosts } from 'app/blog/utils'
+import { Locale } from 'app/i18n'
 
-export function BlogPosts() {
-  let allBlogs = getBlogPosts()
+export function BlogPosts({ locale }: { locale: Locale }) {
+  let allBlogs = getBlogPosts(locale)
+  let blogPrefix = locale === 'fr' ? '/blog' : '/en/blog'
 
   return (
     <div className="space-y-2">
@@ -19,7 +21,7 @@ export function BlogPosts() {
           <Link
             key={post.slug}
             className="block w-fit text-[var(--muted-strong)] underline underline-offset-4 decoration-[var(--anchor)] hover:text-[var(--accent)]"
-            href={`/blog/${post.slug}`}
+            href={`${blogPrefix}/${post.slug}`}
           >
             {post.metadata.title}
           </Link>

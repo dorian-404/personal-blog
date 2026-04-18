@@ -1,11 +1,16 @@
-'use client'
-
 import Link from 'next/link'
 import { ReactNode } from 'react'
-import { useLanguage } from './language-provider'
+import { getDictionary, Locale } from 'app/i18n'
 
-export function HomeContent({ children }: { children: ReactNode }) {
-  const { dictionary } = useLanguage()
+export function HomeContent({
+  children,
+  locale,
+}: {
+  children: ReactNode
+  locale: Locale
+}) {
+  const dictionary = getDictionary(locale)
+  const blogPath = locale === 'fr' ? '/blog' : '/en/blog'
 
   return (
     <section className="space-y-6">
@@ -32,7 +37,7 @@ export function HomeContent({ children }: { children: ReactNode }) {
                 ''
               )}
               <Link
-                href="/blog"
+                href={blogPath}
                 className="text-[var(--accent)] underline underline-offset-4 decoration-[var(--anchor)]"
               >
                 {dictionary.home.blogLabel}

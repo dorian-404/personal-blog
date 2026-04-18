@@ -1,5 +1,6 @@
 import fs from 'fs'
 import path from 'path'
+import { Locale } from 'app/i18n'
 
 type Metadata = {
   title: string
@@ -7,6 +8,8 @@ type Metadata = {
   summary: string
   image?: string
   tags?: string
+  slug?: string
+  translationKey: string
 }
 
 type Heading = {
@@ -99,7 +102,7 @@ function getMDXData(dir) {
   let mdxFiles = getMDXFiles(dir)
   return mdxFiles.map((file) => {
     let { metadata, content } = readMDXFile(path.join(dir, file))
-    let slug = path.basename(file, path.extname(file))
+    let slug = metadata.slug || path.basename(file, path.extname(file))
 
     return {
       metadata,
@@ -112,11 +115,19 @@ function getMDXData(dir) {
   })
 }
 
-export function getBlogPosts() {
-  return getMDXData(path.join(process.cwd(), 'app', 'blog', 'posts'))
+export function getBlogPosts(locale: Locale) {
+  return getMDXData(path.join(process.cwd(), 'app', 'blog', 'posts', locale))
 }
 
-export function formatDate(date: string, includeRelative = false) {
+export function getBlogPost(locale: Locale, slug: string) {
+  return getBlogPosts(locale).find((post) => post.slug === slug)
+}
+
+export function formatDate(
+  date: string,
+  locale: Locale,
+  includeRelative = false
+) {
   let currentDate = new Date()
   if (!date.includes('T')) {
     date = `${date}T00:00:00`
@@ -130,16 +141,16 @@ export function formatDate(date: string, includeRelative = false) {
   let formattedDate = ''
 
   if (yearsAgo > 0) {
-    formattedDate = `${yearsAgo}y ago`
+    formattedDate = locale === 'fr' ? `il y a ${yearsAgo} an${yearsAgo > 1 ? 's' : ''}` : `${yearsAgo}y ago`
   } else if (monthsAgo > 0) {
-    formattedDate = `${monthsAgo}mo ago`
+    formattedDate = locale === 'fr' ? `il y a ${monthsAgo} mois` : `${monthsAgo}mo ago`
   } else if (daysAgo > 0) {
-    formattedDate = `${daysAgo}d ago`
+    formattedDate = locale === 'fr' ? `il y a ${daysAgo} j` : `${daysAgo}d ago`
   } else {
-    formattedDate = 'Today'
+    formattedDate = locale === 'fr' ? "Aujourd'hui" : 'Today'
   }
 
-  let fullDate = targetDate.toLocaleString('en-us', {
+  let fullDate = targetDate.toLocaleString(locale === 'fr' ? 'fr-CA' : 'en-US', {
     month: 'long',
     day: 'numeric',
     year: 'numeric',

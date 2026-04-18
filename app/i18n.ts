@@ -1,20 +1,8 @@
-'use client'
+export type Locale = 'fr' | 'en'
 
-import {
-  createContext,
-  ReactNode,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react'
+export const defaultLocale: Locale = 'fr'
 
-export type Locale = 'en' | 'fr'
-
-const STORAGE_KEY = 'locale'
-const DEFAULT_LOCALE: Locale = 'fr'
-
-const dictionaries = {
+export const dictionaries = {
   en: {
     nav: {
       home: 'home',
@@ -45,14 +33,21 @@ const dictionaries = {
       writingBlurb: 'notes on code, tools, interfaces, and recurring ideas.',
       blogLabel: 'blog',
     },
+    blog: {
+      title: 'Blog',
+      description: 'Read my writing on code, tools, interfaces, and product thinking.',
+    },
     article: {
       onThisPage: 'On This Page',
       minRead: 'min read',
     },
     controls: {
       language: 'Language',
-      english: 'English',
-      french: 'French',
+    },
+    metadata: {
+      siteTitle: 'Dorian Michael',
+      siteDescription:
+        'Personal blog about software, interfaces, tools, and product thinking.',
     },
   },
   fr: {
@@ -71,9 +66,9 @@ const dictionaries = {
       role: 'développeur, produit, ingénieur, auteur',
       stints: 'Parcours',
       stintsItems: [
-        "je construis des produits numériques avec une préférence pour la clarté, la vitesse et les interfaces calmes.",
+        'je construis des produits numériques avec une préférence pour la clarté, la vitesse et les interfaces calmes.',
         "j'explore l'espace entre l’ingénierie et l’écriture à travers des outils expressifs et compacts.",
-        "je transforme ce site en carnet d’expériences, d’opinions et de leçons du web, surtout à travers le blog.",
+        'je transforme ce site en carnet d’expériences, d’opinions et de leçons du web, surtout à travers le blog.',
       ],
       interests: 'Intérêts',
       interestItems: [
@@ -82,8 +77,14 @@ const dictionaries = {
         'écriture sur le goût produit, l’expérience développeur et la culture internet',
       ],
       writingAbout: "J'écris sur",
-      writingBlurb: 'des notes sur le code, les outils, les interfaces et les idées qui reviennent.',
+      writingBlurb:
+        'des notes sur le code, les outils, les interfaces et les idées qui reviennent.',
       blogLabel: 'blog',
+    },
+    blog: {
+      title: 'Blog',
+      description:
+        "Lire mes textes sur le code, les outils, les interfaces et la réflexion produit.",
     },
     article: {
       onThisPage: 'Sur cette page',
@@ -91,72 +92,52 @@ const dictionaries = {
     },
     controls: {
       language: 'Langue',
-      english: 'Anglais',
-      french: 'Français',
+    },
+    metadata: {
+      siteTitle: 'Dorian Michael',
+      siteDescription:
+        'Blog personnel sur le logiciel, les interfaces, les outils et la réflexion produit.',
     },
   },
 } as const
 
-type Dictionary = (typeof dictionaries)[Locale]
+export type Dictionary = (typeof dictionaries)[Locale]
 
-type LanguageContextValue = {
-  dictionary: Dictionary
-  locale: Locale
-  setLocale: (locale: Locale) => void
+export function getDictionary(locale: Locale) {
+  return dictionaries[locale]
 }
 
-const LanguageContext = createContext<LanguageContextValue | null>(null)
+export const articleTranslations = {
+  aboutDev: {
+    fr: 'le-dev-est-foutu',
+    en: 'is-dev-cooked',
+  },
+  staticTyping: {
+    fr: 'puissance-du-typage-statique',
+    en: 'power-of-static-typing',
+  },
+  spacesVsTabs: {
+    fr: 'espaces-vs-tabs',
+    en: 'spaces-vs-tabs',
+  },
+  vim: {
+    fr: 'adopter-vim',
+    en: 'embracing-vim',
+  },
+} as const
 
-function getInitialLocale(): Locale {
-  if (typeof window === 'undefined') {
-    return DEFAULT_LOCALE
+export function getLocalePath(locale: Locale, pathname: string) {
+  if (locale === 'fr') {
+    if (pathname === '/en') {
+      return '/'
+    }
+
+    return pathname.replace(/^\/en(?=\/|$)/, '') || '/'
   }
 
-  const stored = window.localStorage.getItem(STORAGE_KEY)
-  if (stored === 'en' || stored === 'fr') {
-    return stored
+  if (pathname === '/') {
+    return '/en'
   }
 
-  return DEFAULT_LOCALE
-}
-
-export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>(DEFAULT_LOCALE)
-
-  useEffect(() => {
-    const initialLocale = getInitialLocale()
-    setLocaleState(initialLocale)
-    document.documentElement.lang = initialLocale
-  }, [])
-
-  function setLocale(nextLocale: Locale) {
-    setLocaleState(nextLocale)
-    window.localStorage.setItem(STORAGE_KEY, nextLocale)
-    document.documentElement.lang = nextLocale
-  }
-
-  const value = useMemo(
-    () => ({
-      dictionary: dictionaries[locale],
-      locale,
-      setLocale,
-    }),
-    [locale]
-  )
-
-  return (
-    <LanguageContext.Provider value={value}>
-      {children}
-    </LanguageContext.Provider>
-  )
-}
-
-export function useLanguage() {
-  const context = useContext(LanguageContext)
-
-  if (!context) {
-    throw new Error('useLanguage must be used within LanguageProvider')
-  }
-
-  return context
+  return pathname.startsWith('/en') ? pathname : `/en${pathname}`
 }

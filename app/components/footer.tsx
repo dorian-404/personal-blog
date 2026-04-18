@@ -1,6 +1,4 @@
-'use client'
-
-import { useLanguage } from './language-provider'
+import { getDictionary, Locale } from 'app/i18n'
 
 function ArrowIcon() {
   return (
@@ -19,8 +17,9 @@ function ArrowIcon() {
   )
 }
 
-export default function Footer() {
-  const { dictionary } = useLanguage()
+export default function Footer({ locale }: { locale: Locale }) {
+  const dictionary = getDictionary(locale)
+  const rssPath = locale === 'fr' ? '/rss?lang=fr' : '/rss?lang=en'
 
   return (
     <footer className="mb-8">
@@ -30,7 +29,7 @@ export default function Footer() {
             className="flex items-center transition-all hover:text-[var(--foreground)]"
             rel="noopener noreferrer"
             target="_blank"
-            href="/rss"
+            href={rssPath}
           >
             <ArrowIcon />
             <p className="ml-2 h-7">{dictionary.footer.rss}</p>
