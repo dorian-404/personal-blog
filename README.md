@@ -2,7 +2,7 @@
 
 Site personnel — écriture, notes et expériences sur le code et les interfaces.
 
-**→** [personal-blog-nu-eosin.vercel.app](https://www.mishaeldorian.com/)
+**→** [mishaeldorian.com](https://www.mishaeldorian.com/)
 
 ## Stack
 
